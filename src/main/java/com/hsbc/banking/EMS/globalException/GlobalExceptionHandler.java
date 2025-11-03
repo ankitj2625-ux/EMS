@@ -32,4 +32,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleDatabaseException(EmployeeDatabaseException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
     }
+//    @ExceptionHandler(EmployeeDatabaseException.class)
+//    public ResponseEntity<String> EmployeeCreationException(EmployeeCreationException ex) {
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+//    }
+
 }
