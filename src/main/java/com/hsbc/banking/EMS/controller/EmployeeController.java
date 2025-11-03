@@ -7,10 +7,7 @@ import com.hsbc.banking.EMS.util.EmployeeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,10 +29,28 @@ public class EmployeeController {
         return new ResponseEntity<>("API is running", HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<EmployeeResponse> getEmployeeById(@PathVariable Long id) {
-        EmployeeResponse employeeResponse = employeeServiceimpl.getEmployeeById(id);
-        return new ResponseEntity<>(employeeResponse, HttpStatus.CREATED);
+//    @GetMapping("/{id}")
+//    public ResponseEntity<EmployeeResponse> getEmployeeById(@PathVariable Long id) {
+//        EmployeeResponse employeeResponse = employeeServiceimpl.getEmployeeById(id);
+//        return new ResponseEntity<>(employeeResponse, HttpStatus.CREATED);
+//    }
+
+    @PostMapping("/createEmployee")
+    public ResponseEntity<EmployeeResponse> createEmployee(@RequestBody EmployeeResponse employeeRequest) {
+      employeeServiceimpl.creteEmployee(employeeRequest);
+      return new ResponseEntity<>(employeeRequest, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/getEmployeeById/{id}")
+    public ResponseEntity<EmployeeResponse> getEmployeeById(@PathVariable("id") Long employeeId){
+        EmployeeResponse employeeResponse = employeeServiceimpl.getEmployeeById(employeeId);
+        return new ResponseEntity<>(employeeResponse, HttpStatus.OK);
+    }
+    
+    @GetMapping("/getAllEmployee")
+    public ResponseEntity<List<EmployeeResponse>> getAllEmployee(){
+        List<EmployeeResponse> employeeResponses = employeeServiceimpl.getAllEmployee();
+        return new ResponseEntity<>(employeeResponses, HttpStatus.OK);
     }
 
 }
