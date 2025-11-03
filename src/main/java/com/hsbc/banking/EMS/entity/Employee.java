@@ -21,5 +21,5 @@ public class Employee {
     private String employeeName;
     private Integer employeeAge;
     private String gender;
-    private Double Salary;
+    private Double salary;
 }
