@@ -22,6 +22,7 @@ public class Employee {
     private Integer employeeAge;
     private String gender;
     private Double salary;
+    This is a sample text to understand git conflict
 
     private Department department;
 }
