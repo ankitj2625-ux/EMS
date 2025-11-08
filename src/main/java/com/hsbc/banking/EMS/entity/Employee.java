@@ -22,4 +22,6 @@ public class Employee {
     private Integer employeeAge;
     private String gender;
     private Double salary;
+
+    private Department department;
 }
