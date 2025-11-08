@@ -1,6 +1,7 @@
 package com.hsbc.banking.EMS.constants;
 
 public class AppConstant {
+    THis is sample text to understanding Git conflicts
     public static final String EMPLOYEE_NOT_FOUND = "Employee not found with ID: ";
     public static final String EMPLOYEE_CREATED_SUCCESS = "Employee created successfully";
     public static final String EMPLOYEE_UPDATED_SUCCESS = "Employee updated successfully";
