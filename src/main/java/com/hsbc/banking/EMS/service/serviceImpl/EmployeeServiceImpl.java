@@ -7,6 +7,7 @@ import com.hsbc.banking.EMS.model.request.EmployeeRequest;
 import com.hsbc.banking.EMS.model.response.EmployeeResponse;
 import com.hsbc.banking.EMS.repository.EmployeeRepository;
 import com.hsbc.banking.EMS.util.EmployeeUtils;
+import com.hsbc.banking.EMS.util.enums.Operator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class EmployeeServiceImpl {
     private final EmployeeUtils employeeUtils;
     private final EmployeeRepository employeeRepository;
 
-    public EmployeeResponse creteEmployee(EmployeeResponse employeeRequest) {
+    public EmployeeResponse createEmployee(EmployeeRequest employeeRequest) {
 
         try {
             if (employeeRequest == null) {
@@ -73,7 +74,7 @@ public class EmployeeServiceImpl {
         }
     }
 
-    public List<EmployeeResponse> getAllEmployee() {
+    public List<EmployeeResponse> getEmployees() {
         return employeeRepository.findAll().stream()
                 .map(emp -> {
                     EmployeeResponse employeeResponse = new EmployeeResponse();
@@ -139,4 +140,86 @@ public class EmployeeServiceImpl {
         }
     }
 
+    public List<EmployeeResponse> getEmployeeByAge(Integer age) {
+        try {
+            List<EmployeeResponse> employeeList = employeeRepository.findByEmployeeAge(age);
+            if (employeeList.isEmpty()) {
+                throw new EmployeeNotFoundException("No employees found with age: " + age);
+            }
+
+            return employeeList.stream()
+                    .map(emp -> EmployeeResponse.builder()
+                            .employeeId(emp.getEmployeeId())
+                            .employeeName(emp.getEmployeeName())
+                            .employeeAge(emp.getEmployeeAge())
+                            .gender(emp.getGender())
+                            .salary(emp.getSalary())
+                            .build()).toList();
+        } catch (Exception ex) {
+            throw new EmployeeNotFoundException("Error retrieving employee with age " + age + ": " + ex.getMessage());
+        }
+    }
+
+    public EmployeeResponse getSalaryById(Long employeeId) {
+        return null;
+    }
+
+    public EmployeeResponse deleteEmployeeById(Long employeeId) {
+        return null;
+    }
+
+    public EmployeeResponse updateEmployeeSalaryById(Long employeeId, Double salary) {
+        return null;
+    }
+
+    public EmployeeResponse updateEmployeeAgeById(Long employeeId, Double salary) {
+        return null;
+    }
+
+
+    public List<EmployeeResponse> getEmployee(EmployeeRequest employeeRequest) {
+        //TODO: getemployee by multiple filters
+        return null;
+    }
+
+    public List<EmployeeResponse> getEmployeesBySalary(Double salary, Operator operator) {
+
+        List<EmployeeResponse> employees = getEmployees();
+        List<EmployeeResponse> filteredEmployee = employees.stream().filter(emp -> {
+            switch (operator) {
+                case GREATER:
+                    return emp.getSalary() > salary;
+                case LESS:
+                    return emp.getSalary() < salary;
+                case EQUALS:
+                    return emp.getSalary().equals(salary);
+                default:
+                    throw new IllegalArgumentException("Invalid operator: " + operator);
+            }
+        }).toList();
+        return filteredEmployee;
+
+
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
