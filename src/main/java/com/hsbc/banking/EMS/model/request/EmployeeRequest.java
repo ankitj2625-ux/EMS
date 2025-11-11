@@ -7,7 +7,6 @@ import lombok.Data;
 @Builder
 public class EmployeeRequest {
 
-    private Long employeeId;
     private String employeeName;
     private Integer employeeAge;
     private String gender;

@@ -1,11 +1,12 @@
 package com.hsbc.banking.EMS.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serializable;
 
 @Entity
 //@Table(name = "Employee")
@@ -14,7 +15,7 @@ import java.io.Serializable;
 @ToString
 public class Employee {
 
-//    @Column(name="emp_id")
+    //    @Column(name="emp_id")
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long employeeId;
@@ -22,7 +23,7 @@ public class Employee {
     private Integer employeeAge;
     private String gender;
     private Double salary;
-    This is a sample text to understand git conflict
+    //This is a sample text to understand git conflict
 
     private Department department;
 }
