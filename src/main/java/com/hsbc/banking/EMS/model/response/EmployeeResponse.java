@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@JsonIgnoreProperties
+//@JsonIgnoreProperties
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmployeeResponse {

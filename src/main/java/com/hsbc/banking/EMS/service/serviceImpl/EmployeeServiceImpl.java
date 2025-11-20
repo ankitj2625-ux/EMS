@@ -1,125 +1,91 @@
 package com.hsbc.banking.EMS.service.serviceImpl;
 
 import com.hsbc.banking.EMS.entity.Employee;
-import com.hsbc.banking.EMS.globalException.exception.EmployeeCreationException;
 import com.hsbc.banking.EMS.globalException.exception.EmployeeNotFoundException;
+import com.hsbc.banking.EMS.mapper.EmployeeMapper;
 import com.hsbc.banking.EMS.model.request.EmployeeRequest;
 import com.hsbc.banking.EMS.model.response.EmployeeResponse;
 import com.hsbc.banking.EMS.repository.EmployeeRepository;
 import com.hsbc.banking.EMS.util.EmployeeUtils;
 import com.hsbc.banking.EMS.util.enums.Operator;
-import lombok.RequiredArgsConstructor;
+import com.hsbc.banking.EMS.validator.EmployeeValidator;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
+@AllArgsConstructor
 public class EmployeeServiceImpl {
 
     private final EmployeeUtils employeeUtils;
     private final EmployeeRepository employeeRepository;
+    private final EmployeeMapper employeeMapper;
+    private final EmployeeValidator employeeValidator;
+
 
     public EmployeeResponse createEmployee(EmployeeRequest employeeRequest) {
-
-        try {
-            if (employeeRequest == null) {
-                throw new RuntimeException("Employee request cannot be null");
-            }
-            if (employeeRequest.getSalary() == null || employeeRequest.getSalary() < 0) {
-                throw new EmployeeCreationException("salary must be non-negative");
-            }
-
-            Employee employee = new Employee();
-            employee.setEmployeeName(employeeRequest.getEmployeeName());
-            employee.setEmployeeAge(employeeRequest.getEmployeeAge());
-            employee.setGender(employeeRequest.getGender());
-            employee.setSalary(employeeRequest.getSalary());
-            Employee savedEmployee = employeeRepository.save(employee);
-
-            return EmployeeResponse.builder()
-                    .employeeName(savedEmployee.getEmployeeName())
-                    .employeeAge(savedEmployee.getEmployeeAge())
-                    .gender(savedEmployee.getGender())
-                    .salary(savedEmployee.getSalary())
-                    .build();
-
-        } catch (Exception ex) {
-            throw new EmployeeCreationException("Failed to create employee: " + ex.getMessage());
-        }
+        employeeValidator.validateEmployeeRequest(employeeRequest);
+        Employee employee = employeeMapper.mapToEmployee(employeeRequest, null);
+        Employee savedEmployee = employeeRepository.save(employee);
+        return employeeMapper.mapToEmployeeResponse(savedEmployee);
     }
 
+    //TODO: add validation for employeeId and add cacheble
     public EmployeeResponse getEmployeeById(Long employeeId) {
-        try {
-            Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new RuntimeException("Employee not found with id: " + employeeId));
-            if (employee.getEmployeeId() == null) {
-                throw new RuntimeException("Employee ID is null for id: " + employeeId);
-            }
-            if (employee.getSalary() == null) {
-                throw new RuntimeException("Employee salary is null for id: " + employeeId);
-            }
-
-            return EmployeeResponse.builder()
-                    .employeeId(employee.getEmployeeId())
-                    .employeeName(employee.getEmployeeName())
-                    .employeeAge(employee.getEmployeeAge())
-                    .salary(employee.getSalary())
-                    .gender(employee.getGender())
-                    .build();
-        } catch (Exception ex) {
-            throw new EmployeeNotFoundException("Error retrieving employee with id " + employeeId + ": " + ex.getMessage());
-        }
+        employeeValidator.mandatoryParameterCheck(employeeId, "employee Id");
+        employeeValidator.parameterTypeCheck(employeeId, "employee Id", Long.class);
+        Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new RuntimeException("Employee not found with id: " + employeeId));
+        return employeeMapper.mapToEmployeeResponse(employee);
     }
 
+    //TODO: Introduce cachable
     public List<EmployeeResponse> getEmployees() {
-        return employeeRepository.findAll().stream()
-                .map(emp -> {
-                    EmployeeResponse employeeResponse = new EmployeeResponse();
-                    employeeResponse.setEmployeeId(emp.getEmployeeId());
-                    employeeResponse.setEmployeeName(emp.getEmployeeName());
-                    employeeResponse.setEmployeeAge(emp.getEmployeeAge());
-                    employeeResponse.setGender(emp.getGender());
-                    employeeResponse.setSalary(emp.getSalary());
-                    return employeeResponse;
-                }).collect(Collectors.toList());
+        return employeeMapper.mapToEmployeeResponseList(employeeRepository.findAll());
     }
 
     public EmployeeResponse updateEmployeeById(EmployeeRequest employeeRequest, Long employeeId) {
+        employeeValidator.validateEmployeeRequest(employeeRequest);
+        Employee employee = employeeMapper.mapToEmployee(employeeRequest, employeeId);
+        Employee updatedEmployee = employeeRepository.save(employee);
+        return employeeMapper.mapToEmployeeResponse(updatedEmployee);
 
-        try {
-            if (employeeId == null) {
-                throw new RuntimeException("Employee ID cannot be null");
-            }
-            if (employeeRequest.getEmployeeAge() < 0) {
-                throw new RuntimeException("salary must be non-negative");
-            }
 
-            Employee existingEmployee = employeeRepository.findById(employeeId)
-                    .orElseThrow(() -> new RuntimeException("Employee not found with id: " + employeeId));
-            existingEmployee.setEmployeeName(employeeRequest.getEmployeeName());
-            existingEmployee.setEmployeeAge(employeeRequest.getEmployeeAge());
-            existingEmployee.setGender(employeeRequest.getGender());
-            existingEmployee.setSalary(employeeRequest.getSalary());
-            Employee employee = employeeRepository.save(existingEmployee);
+//        try {
+//            if (employeeId == null) {
+//                throw new RuntimeException("Employee ID cannot be null");
+//            }
+//            if (employeeRequest.getEmployeeAge() < 0) {
+//                throw new RuntimeException("salary must be non-negative");
+//            }
+//            existingEmployee.setEmployeeName(employeeRequest.getEmployeeName());
+//            existingEmployee.setEmployeeAge(employeeRequest.getEmployeeAge());
+//            existingEmployee.setGender(employeeRequest.getGender());
+//            existingEmployee.setSalary(employeeRequest.getSalary());
 
-            EmployeeResponse employeeResponse = new EmployeeResponse();
-            employeeResponse.setEmployeeId(employee.getEmployeeId());
-            employeeResponse.setEmployeeName(employee.getEmployeeName());
-            employeeResponse.setEmployeeAge(employee.getEmployeeAge());
-            employeeResponse.setGender(employee.getGender());
-            employeeResponse.setSalary(employee.getSalary());
-            return employeeResponse;
-
-        } catch (Exception ex) {
-            throw new EmployeeNotFoundException("Error updating employee with id " + employeeId + ": " + ex.getMessage());
-        }
+//            EmployeeResponse employeeResponse = new EmployeeResponse();
+//            employeeResponse.setEmployeeId(employee.getEmployeeId());
+//            employeeResponse.setEmployeeName(employee.getEmployeeName());
+//            employeeResponse.setEmployeeAge(employee.getEmployeeAge());
+//            employeeResponse.setGender(employee.getGender());
+//            employeeResponse.setSalary(employee.getSalary());
+//            return employeeResponse;
     }
 
     public List<EmployeeResponse> getEmployeeByGender(String gender) {
-        try {
+
+        EmployeeValidator.validateGender(gender);
+        List<Employee> employeeList = employeeRepository.findEmployeeByGender(gender);
+        return employeeList.stream()
+                .filter(emp -> emp.getGender().equalsIgnoreCase(gender))
+                .map(employeeMapper::mapToEmployeeResponse)
+                .toList();
+
+
+        /* try {
             List<Employee> employee = employeeRepository.findEmployeeByGender(gender);
             if (employee.isEmpty()) {
                 throw new EmployeeNotFoundException("No employees found with gender: " + gender);
@@ -137,7 +103,7 @@ public class EmployeeServiceImpl {
                     .collect(Collectors.toList());
         } catch (Exception ex) {
             throw new EmployeeNotFoundException("Error retrieving employee with gender " + gender + ": " + ex.getMessage());
-        }
+        }*/
     }
 
     public List<EmployeeResponse> getEmployeeByAge(Integer age) {
@@ -164,8 +130,8 @@ public class EmployeeServiceImpl {
         return null;
     }
 
-    public EmployeeResponse deleteEmployeeById(Long employeeId) {
-        return null;
+    public void deleteEmployeeById(Long employeeId) {
+        employeeRepository.deleteById(employeeId);
     }
 
     public EmployeeResponse updateEmployeeSalaryById(Long employeeId, Double salary) {
