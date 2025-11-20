@@ -12,6 +12,5 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     List<Employee> findEmployeeByGender(String gender);
 
-
     List<EmployeeResponse> findByEmployeeAge(Integer age);
 }

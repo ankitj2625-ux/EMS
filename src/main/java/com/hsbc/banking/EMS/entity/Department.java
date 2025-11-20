@@ -21,7 +21,7 @@ public class Department {
     private String location;
     private String managerName;
     private Integer totalEmployees;
-
-    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
-    private List<Employee> employees;
+//
+//    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
+//    private List<Employee> employees;
 }

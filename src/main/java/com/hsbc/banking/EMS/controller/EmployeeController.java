@@ -6,7 +6,7 @@ import com.hsbc.banking.EMS.model.response.EmployeeResponse;
 import com.hsbc.banking.EMS.service.serviceImpl.EmployeeServiceImpl;
 import com.hsbc.banking.EMS.util.enums.Operator;
 import jakarta.annotation.Nullable;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,27 +15,32 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 @Slf4j
 @RestController
 @RequestMapping("/employees")
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
+@AllArgsConstructor
+//TODO: add cross origin
 public class EmployeeController {
-    Logger logger = Logger.getLogger(EmployeeController.class.getName());
+
+    //    Logger logger = Logger.getLogger(EmployeeController.class.getName());
     private final EmployeeServiceImpl employeeService;
 
+    //TODO: add swagger documentation
     @GetMapping("/health")
     public ResponseEntity<String> healthCheck() {
         return new ResponseEntity<>("API is running", HttpStatus.OK);
     }
 
+    //TODO: intorduce generic response class for all APIs
     @GetMapping("/")
     public ResponseEntity<List<EmployeeResponse>> getEmployees() {
         List<EmployeeResponse> employees = employeeService.getEmployees();
         return new ResponseEntity<>(employees, HttpStatus.OK);
     }
 
+    //TODO: introduce better response handler
     @PostMapping("/")
     public ResponseEntity<EmployeeResponse> createEmployee(@RequestBody EmployeeRequest employeeRequest) {
         EmployeeResponse response = employeeService.createEmployee(employeeRequest);
@@ -50,6 +55,7 @@ public class EmployeeController {
         return new ResponseEntity<>(employeeResponse, headers, HttpStatus.OK);
     }
 
+    //TODO: add validation for request body
     @PutMapping("/{id}")
     public ResponseEntity<EmployeeResponse> updateEmployeeById(@RequestBody EmployeeRequest employeeRequest,
                                                                @PathVariable("id") Long employeeId) {
@@ -58,9 +64,9 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<EmployeeResponse> deleteEmployeeById(@PathVariable("id") Long employeeId) {
-        EmployeeResponse response = employeeService.deleteEmployeeById(employeeId);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    public ResponseEntity<String> deleteEmployeeById(@PathVariable("id") Long employeeId) {
+        employeeService.deleteEmployeeById(employeeId);
+        return new ResponseEntity<>("Deleted Employee successfully : " + employeeId, HttpStatus.OK);
     }
 
     @PatchMapping("/{id}/salary")

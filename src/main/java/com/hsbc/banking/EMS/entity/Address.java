@@ -20,7 +20,7 @@ public class Address {
     private String country;
     private String postalCode;
 
-
-    @OneToOne(mappedBy = "address", cascade = CascadeType.ALL)
-    private Employee employee;
+//
+//    @OneToOne(mappedBy = "address", cascade = CascadeType.ALL)
+//    private Employee employee;
 }
